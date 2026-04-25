@@ -50,13 +50,16 @@ export default function StockCard({ ticker, type, name, onRemove }: Props) {
     )
   }
 
-  if (!data) return null
+  if (!data) {
+    return null
+  }
 
   const d = data
   const up = d.change >= 0
-
-    const priceStr = type === "US" ? ("$" + d.price.toFixed(2)) : (d.price.toFixed(0))
-
+  let priceStr = d.price.toFixed(0)
+  if (type === "US") {
+    priceStr = "$" + d.price.toFixed(2)
+  }
 
   return (
     <div className={styles.card}>
@@ -79,15 +82,13 @@ export default function StockCard({ ticker, type, name, onRemove }: Props) {
             <button className={styles.removeBtn} onClick={onRemove}>x</button>
           </div>
         </div>
-
         <div className={styles.signals}>
-{([["MA", d.maS], ["RSI " + d.rsiVal, d.rsiS], ["MACD", d.macdS], ["BB", d.bbS]] as [string, Signal][])
+          {([["MA", d.maS], ["RSI " + d.rsiVal, d.rsiS], ["MACD", d.macdS], ["BB", d.bbS]] as [string, Signal][]).map(([label, sig]) => (
             <span key={label} className={styles.sig + " " + styles[sig]}>
               {label}: {sigLabel(sig)}
             </span>
           ))}
         </div>
-
         <div className={styles.verdictRow}>
           <span className={styles.verdictLabel}>verdict</span>
           <span className={styles.verdictBadge + " " + styles[d.verdict]}>{vLabel(d.verdict)}</span>
@@ -97,30 +98,6 @@ export default function StockCard({ ticker, type, name, onRemove }: Props) {
           </button>
         </div>
       </div>
-
       {open && (
         <div className={styles.detail}>
-          <SparklineChart prices={d.prices} verdict={d.verdict} />
-          <div className={styles.indGrid}>
-            <div className={styles.indBox}>
-              <div className={styles.indLabel}>MA</div>
-              <div className={styles.indVal}>{d.maVal}%</div>
-            </div>
-            <div className={styles.indBox}>
-              <div className={styles.indLabel}>RSI</div>
-              <div className={styles.indVal}>{d.rsiVal}</div>
-            </div>
-            <div className={styles.indBox}>
-              <div className={styles.indLabel}>MACD</div>
-              <div className={styles.indVal}>{d.macdVal}</div>
-            </div>
-            <div className={styles.indBox}>
-              <div className={styles.indLabel}>BB</div>
-              <div className={styles.indVal}>{d.bbVal}%</div>
-            </div>
-          </div>
-        </div>
-      )}
-    </div>
-  )
-}
+          <SparklineChart price
