@@ -1,0 +1,24 @@
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 10px 12px;
+  cursor: pointer;
+  transition: border-color 0.15s;
+  user-select: none;
+}
+.card:hover { border-color: #bbb; }
+.card.open { border-color: var(--accent); }
+
+.abbr { font-family: var(--mono); font-size: 12px; font-weight: 500; color: var(--text); margin-bottom: 2px; }
+.full { font-size: 11px; color: var(--muted); margin-bottom: 4px; }
+.body { font-size: 11px; color: var(--text); line-height: 1.55; }
+.extra {
+  font-size: 11px;
+  color: var(--muted);
+  margin-top: 6px;
+  padding-top: 6px;
+  border-top: 1px solid var(--border);
+  line-height: 1.55;
+}
+.extra strong { color: var(--text); font-weight: 500; }
