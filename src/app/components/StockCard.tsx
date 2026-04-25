@@ -81,7 +81,7 @@ export default function StockCard({ ticker, type, name, onRemove }: Props) {
         </div>
 
         <div className={styles.signals}>
-          {([["MA", d.maS], ["RSI", d.rsiS], ["MACD", d.macdS], ["BB", d.bbS]] as [string, Signal][]).map(([label, sig]) => (
+{([["MA", d.maS], ["RSI " + d.rsiVal, d.rsiS], ["MACD", d.macdS], ["BB", d.bbS]] as [string, Signal][])
             <span key={label} className={styles.sig + " " + styles[sig]}>
               {label}: {sigLabel(sig)}
             </span>
