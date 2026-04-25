@@ -90,3 +90,4 @@ export default function StockCard({ ticker, type, name, onRemove }: Props) {
             {[
               { label: "MA乖離率", val: `${d.maVal}%`, hint: "vs 25日MA" },
               { label: "RSI", val: d.rsi
+                
