@@ -57,9 +57,7 @@ export default function StockCard({ ticker, type, name, onRemove }: Props) {
   const d = data
   const up = d.change >= 0
   let priceStr = d.price.toFixed(0)
-  if (type === "US") {
-    priceStr = "$" + d.price.toFixed(2)
-  }
+  if (type === "US") { priceStr = "$" + d.price.toFixed(2) }
 
   return (
     <div className={styles.card}>
