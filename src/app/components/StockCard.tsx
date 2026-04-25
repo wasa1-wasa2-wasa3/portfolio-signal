@@ -88,5 +88,5 @@ export default function StockCard({ ticker, type, name, onRemove }: Props) {
           <SparklineChart prices={d.prices} verdict={d.verdict} />
           <div className={styles.indGrid}>
             {[
-              { label: "MA乖離率", val: `${d.maVal}%`, hint: "vs 25日MA" },
+              { label: "MA乖離率", val: (d.maVal + "%"), hint: "vs 25日MA" },
               { label: "RSI", val: d.rsi
