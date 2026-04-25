@@ -50,7 +50,7 @@ export default function StockCard({ ticker, type, name, onRemove }: Props) {
   if (!data) return null
   const d = data
   const up = d.change >= 0
-  const priceStr = type === "US" ? `$${d.price.toFixed(2)}` : `¥${Math.round(d.price).toLocaleString()}`
+  const priceStr = type === "US" ? ("$" + d.price.toFixed(2)) : ("¥" + Math.round(d.price).toLocaleString())
 
   return (
     <div className={styles.card}>
