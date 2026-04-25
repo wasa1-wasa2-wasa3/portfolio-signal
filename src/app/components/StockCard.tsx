@@ -1,7 +1,7 @@
 "use client"
 import { useState, useEffect } from "react"
 import dynamic from "next/dynamic"
-import { calcSignals, fetchPrices, genPrices } from "@/lib/indicators"
+import { calcSignals, fetchPrices } from "@/lib/indicators"
 import type { Signal, Verdict, SignalResult } from "@/lib/indicators"
 import styles from "./StockCard.module.css"
 
@@ -14,8 +14,8 @@ interface Props {
   onRemove: () => void
 }
 
-function sigLabel(s: Signal) { return s === "buy" ? "”ƒ‚¢" : s === "sell" ? "”„‚è" : "’†—§" }
-function vLabel(v: Verdict) { return v === "BUY" ? "”ƒ‚¢ê" : v === "SELL" ? "”„‚èê" : "—lqŒ©" }
+function sigLabel(s: Signal) { return s === "buy" ? "è²·ã„" : s === "sell" ? "å£²ã‚Š" : "ä¸­ç«‹" }
+function vLabel(v: Verdict) { return v === "BUY" ? "è²·ã„å ´" : v === "SELL" ? "å£²ã‚Šå ´" : "æ§˜å­è¦‹" }
 
 export default function StockCard({ ticker, type, name, onRemove }: Props) {
   const [open, setOpen] = useState(false)
@@ -42,7 +42,7 @@ export default function StockCard({ ticker, type, name, onRemove }: Props) {
             <div className={styles.name}>{name}</div>
           </div>
         </div>
-        <div style={{color:"var(--muted)",fontSize:12,fontFamily:"var(--mono)"}}>ƒf[ƒ^æ“¾’†...</div>
+        <div style={{color:"var(--muted)",fontSize:12,fontFamily:"var(--mono)"}}>ãƒ‡ãƒ¼ã‚¿å–å¾—ä¸­...</div>
       </div>
     </div>
   )
@@ -50,7 +50,7 @@ export default function StockCard({ ticker, type, name, onRemove }: Props) {
   if (!data) return null
   const d = data
   const up = d.change >= 0
-  const priceStr = type === "US" ? `$${d.price.toFixed(2)}` : `\${Math.round(d.price * (type === "ETF" ? 10 : 1)).toLocaleString()}`
+  const priceStr = type === "US" ? `$${d.price.toFixed(2)}` : `Â¥${Math.round(d.price).toLocaleString()}`
 
   return (
     <div className={styles.card}>
@@ -68,7 +68,7 @@ export default function StockCard({ ticker, type, name, onRemove }: Props) {
               <div className={styles.price}>{priceStr}</div>
               <div className={`${styles.chg} ${up ? styles.up : styles.dn}`}>{up ? "+" : ""}{d.change.toFixed(2)}%</div>
             </div>
-            <button className={styles.removeBtn} onClick={onRemove} aria-label="íœ">~</button>
+            <button className={styles.removeBtn} onClick={onRemove} aria-label="å‰Šé™¤">Ã—</button>
           </div>
         </div>
         <div className={styles.signals}>
@@ -77,10 +77,10 @@ export default function StockCard({ ticker, type, name, onRemove }: Props) {
           ))}
         </div>
         <div className={styles.verdictRow}>
-          <span className={styles.verdictLabel}>‘‡”»’è</span>
+          <span className={styles.verdictLabel}>ç·åˆåˆ¤å®š</span>
           <span className={`${styles.verdictBadge} ${styles[d.verdict]}`}>{vLabel(d.verdict)}</span>
-          <span className={styles.scoreNote}>{d.matchCount}/4 ˆê’v</span>
-          <button className={styles.detailBtn} onClick={() => setOpen(!open)}>Ú× {open ? "?" : "?"}</button>
+          <span className={styles.scoreNote}>{d.matchCount}/4 ä¸€è‡´</span>
+          <button className={styles.detailBtn} onClick={() => setOpen(!open)}>è©³ç´° {open ? "â–´" : "â–¾"}</button>
         </div>
       </div>
       {open && (
@@ -88,20 +88,5 @@ export default function StockCard({ ticker, type, name, onRemove }: Props) {
           <SparklineChart prices={d.prices} verdict={d.verdict} />
           <div className={styles.indGrid}>
             {[
-              { label: "MA˜¨—£—¦", val: `${d.maVal}%`, hint: "vs 25“úMA" },
-              { label: "RSI", val: d.rsiVal, hint: "30«”ƒ / 70ª”„" },
-              { label: "MACD", val: d.macdVal, hint: "0’´‚¦ã¸" },
-              { label: "BB•(ƒĞ)", val: `${d.bbVal}%`, hint: "•W€•Î·/•½‹Ï" },
-            ].map(({ label, val, hint }) => (
-              <div key={label} className={styles.indBox}>
-                <div className={styles.indLabel}>{label}</div>
-                <div className={styles.indVal}>{val}</div>
-                <div className={styles.indHint}>{hint}</div>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
-    </div>
-  )
-}
+              { label: "MAä¹–é›¢ç‡", val: `${d.maVal}%`, hint: "vs 25æ—¥MA" },
+              { label: "RSI", val: d.rsi

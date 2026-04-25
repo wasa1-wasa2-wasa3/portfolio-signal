@@ -2,29 +2,20 @@ export type Signal = "buy" | "sell" | "neutral"
 export type Verdict = "BUY" | "SELL" | "HOLD"
 
 export interface SignalResult {
-  maS: Signal
-  rsiS: Signal
-  macdS: Signal
-  bbS: Signal
-  verdict: Verdict
-  matchCount: number
-  rsiVal: string
-  maVal: string
-  macdVal: string
-  bbVal: string
-  price: number
-  change: number
-  prices: number[]
+  maS: Signal; rsiS: Signal; macdS: Signal; bbS: Signal
+  verdict: Verdict; matchCount: number
+  rsiVal: string; maVal: string; macdVal: string; bbVal: string
+  price: number; change: number; prices: number[]
 }
 
 export async function fetchPrices(ticker: string, type: string): Promise<number[]> {
   const apiKey = process.env.NEXT_PUBLIC_TWELVE_DATA_API_KEY
-  const symbol = type === "JP" ? `${ticker}:TSE` : ticker
+  const symbol = type === "JP" || type === "ETF" ? `${ticker}:TSE` : ticker
   const url = `https://api.twelvedata.com/time_series?symbol=${symbol}&interval=1day&outputsize=60&apikey=${apiKey}`
   try {
     const res = await fetch(url)
     const data = await res.json()
-    if (!data.values) throw new Error("no data")
+    if (!data.values || data.status === "error") throw new Error("no data")
     return data.values.map((v: { close: string }) => parseFloat(v.close)).reverse()
   } catch {
     return genPrices(ticker)
@@ -73,15 +64,15 @@ export function calcSignals(prices: number[]): SignalResult {
 }
 
 export const NAMES: Record<string, string> = {
-  "7203": "ƒgƒˆƒ^©“®Ô", "6758": "ƒ\ƒj[ƒOƒ‹[ƒv", "9984": "ƒ\ƒtƒgƒoƒ“ƒNG",
-  "6861": "ƒL[ƒGƒ“ƒX", "4063": "M‰z‰»Šw", "8306": "O•HUFJ",
+  "7203": "ãƒˆãƒ¨ã‚¿è‡ªå‹•è»Š", "6758": "ã‚½ãƒ‹ãƒ¼ã‚°ãƒ«ãƒ¼ãƒ—", "9984": "ã‚½ãƒ•ãƒˆãƒãƒ³ã‚¯G",
+  "6861": "ã‚­ãƒ¼ã‚¨ãƒ³ã‚¹", "4063": "ä¿¡è¶ŠåŒ–å­¦", "8306": "ä¸‰è±UFJ",
   "AAPL": "Apple Inc.", "MSFT": "Microsoft", "NVDA": "NVIDIA",
   "TSLA": "Tesla", "GOOGL": "Alphabet", "AMZN": "Amazon",
-  "1306": "TOPIX˜A“® ETF", "1321": "“úŒo225 ETF", "2558": "S&P500 ETF",
+  "1306": "TOPIXé€£å‹• ETF", "1321": "æ—¥çµŒ225 ETF", "2558": "S&P500 ETF",
 }
 
 export const DEFAULT_PORTFOLIO = [
-  { ticker: "7203", type: "JP" as const, name: "ƒgƒˆƒ^©“®Ô" },
+  { ticker: "7203", type: "JP" as const, name: "ãƒˆãƒ¨ã‚¿è‡ªå‹•è»Š" },
   { ticker: "AAPL", type: "US" as const, name: "Apple Inc." },
-  { ticker: "1306", type: "ETF" as const, name: "TOPIX˜A“® ETF" },
+  { ticker: "1306", type: "ETF" as const, name: "TOPIXé€£å‹• ETF" },
 ]
