@@ -1,30 +1,56 @@
-'use client'
-import { useState } from 'react'
-import dynamic from 'next/dynamic'
-import { calcSignals, genPrices } from '@/lib/indicators'
-import type { Signal, Verdict } from '@/lib/indicators'
-import styles from './StockCard.module.css'
+"use client"
+import { useState, useEffect } from "react"
+import dynamic from "next/dynamic"
+import { calcSignals, fetchPrices, genPrices } from "@/lib/indicators"
+import type { Signal, Verdict, SignalResult } from "@/lib/indicators"
+import styles from "./StockCard.module.css"
 
-const SparklineChart = dynamic(() => import('./SparklineChart'), { ssr: false })
+const SparklineChart = dynamic(() => import("./SparklineChart"), { ssr: false })
 
 interface Props {
   ticker: string
-  type: 'JP' | 'US' | 'ETF'
+  type: "JP" | "US" | "ETF"
   name: string
   onRemove: () => void
 }
 
-function sigLabel(s: Signal) { return s === 'buy' ? 'Ë≤∑„ÅÑ' : s === 'sell' ? 'Â£≤„Çä' : '‰∏≠Á´ã' }
-function vLabel(v: Verdict) { return v === 'BUY' ? 'Ë≤∑„ÅÑÂ†¥' : v === 'SELL' ? 'Â£≤„ÇäÂ†¥' : 'ÊßòÂ≠êË¶ã' }
+function sigLabel(s: Signal) { return s === "buy" ? "îÉÇ¢" : s === "sell" ? "îÑÇË" : "íÜóß" }
+function vLabel(v: Verdict) { return v === "BUY" ? "îÉÇ¢èÍ" : v === "SELL" ? "îÑÇËèÍ" : "óléqå©" }
 
 export default function StockCard({ ticker, type, name, onRemove }: Props) {
   const [open, setOpen] = useState(false)
-  const prices = genPrices(ticker)
-  const d = calcSignals(prices)
+  const [data, setData] = useState<SignalResult | null>(null)
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    setLoading(true)
+    fetchPrices(ticker, type).then(prices => {
+      setData(calcSignals(prices))
+      setLoading(false)
+    })
+  }, [ticker, type])
+
+  if (loading) return (
+    <div className={styles.card}>
+      <div className={styles.main}>
+        <div className={styles.top}>
+          <div className={styles.tickerBlock}>
+            <div className={styles.tickerRow}>
+              <span className={styles.ticker}>{ticker}</span>
+              <span className={styles.typeTag}>{type}</span>
+            </div>
+            <div className={styles.name}>{name}</div>
+          </div>
+        </div>
+        <div style={{color:"var(--muted)",fontSize:12,fontFamily:"var(--mono)"}}>ÉfÅ[É^éÊìæíÜ...</div>
+      </div>
+    </div>
+  )
+
+  if (!data) return null
+  const d = data
   const up = d.change >= 0
-  const priceStr = type === 'US'
-    ? `$${d.price.toFixed(2)}`
-    : `¬•${Math.round(d.price * (type === 'ETF' ? 10 : 1)).toLocaleString()}`
+  const priceStr = type === "US" ? `$${d.price.toFixed(2)}` : `\${Math.round(d.price * (type === "ETF" ? 10 : 1)).toLocaleString()}`
 
   return (
     <div className={styles.card}>
@@ -37,49 +63,35 @@ export default function StockCard({ ticker, type, name, onRemove }: Props) {
             </div>
             <div className={styles.name}>{name}</div>
           </div>
-          <div className={styles.priceGroup}>
+          <div style={{display:"flex",alignItems:"flex-start",gap:10}}>
             <div className={styles.priceBlock}>
               <div className={styles.price}>{priceStr}</div>
-              <div className={`${styles.chg} ${up ? styles.up : styles.dn}`}>
-                {up ? '+' : ''}{d.change.toFixed(2)}%
-              </div>
+              <div className={`${styles.chg} ${up ? styles.up : styles.dn}`}>{up ? "+" : ""}{d.change.toFixed(2)}%</div>
             </div>
-            <button className={styles.removeBtn} onClick={onRemove} aria-label="ÂâäÈô§">√ó</button>
+            <button className={styles.removeBtn} onClick={onRemove} aria-label="çÌèú">Å~</button>
           </div>
         </div>
-
         <div className={styles.signals}>
-          {([
-            ['MA', d.maS],
-            [`RSI ${d.rsiVal}`, d.rsiS],
-            ['MACD', d.macdS],
-            ['BB', d.bbS],
-          ] as [string, Signal][]).map(([label, sig]) => (
-            <span key={label} className={`${styles.sig} ${styles[sig]}`}>
-              {label}: {sigLabel(sig)}
-            </span>
+          {([["MA", d.maS], [`RSI ${d.rsiVal}`, d.rsiS], ["MACD", d.macdS], ["BB", d.bbS]] as [string, Signal][]).map(([label, sig]) => (
+            <span key={label} className={`${styles.sig} ${styles[sig]}`}>{label}: {sigLabel(sig)}</span>
           ))}
         </div>
-
         <div className={styles.verdictRow}>
-          <span className={styles.verdictLabel}>Á∑èÂêàÂà§ÂÆö</span>
+          <span className={styles.verdictLabel}>ëççáîªíË</span>
           <span className={`${styles.verdictBadge} ${styles[d.verdict]}`}>{vLabel(d.verdict)}</span>
-          <span className={styles.scoreNote}>{d.matchCount}/4 ‰∏ÄËá¥</span>
-          <button className={styles.detailBtn} onClick={() => setOpen(!open)}>
-            Ë©≥Á¥∞ {open ? '‚ñ¥' : '‚ñæ'}
-          </button>
+          <span className={styles.scoreNote}>{d.matchCount}/4 àÍív</span>
+          <button className={styles.detailBtn} onClick={() => setOpen(!open)}>è⁄ç◊ {open ? "?" : "?"}</button>
         </div>
       </div>
-
       {open && (
         <div className={styles.detail}>
           <SparklineChart prices={d.prices} verdict={d.verdict} />
           <div className={styles.indGrid}>
             {[
-              { label: 'MA‰πñÈõ¢Áéá', val: `${d.maVal}%`, hint: 'vs 25Êó•MA' },
-              { label: 'RSI', val: d.rsiVal, hint: '30‚ÜìË≤∑ / 70‚ÜëÂ£≤' },
-              { label: 'MACD', val: d.macdVal, hint: '0Ë∂Ö„ÅàÔºù‰∏äÊòá' },
-              { label: 'BBÂπÖ(œÉ)', val: `${d.bbVal}%`, hint: 'Ê®ôÊ∫ñÂÅèÂ∑Æ/Âπ≥Âùá' },
+              { label: "MAò®ó£ó¶", val: `${d.maVal}%`, hint: "vs 25ì˙MA" },
+              { label: "RSI", val: d.rsiVal, hint: "30Å´îÉ / 70Å™îÑ" },
+              { label: "MACD", val: d.macdVal, hint: "0í¥Ç¶ÅÅè„è∏" },
+              { label: "BBïù(É–)", val: `${d.bbVal}%`, hint: "ïWèÄïŒç∑/ïΩãœ" },
             ].map(({ label, val, hint }) => (
               <div key={label} className={styles.indBox}>
                 <div className={styles.indLabel}>{label}</div>
