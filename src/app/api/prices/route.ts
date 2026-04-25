@@ -6,7 +6,7 @@ export async function GET(req: NextRequest) {
   const type = searchParams.get("type") || ""
 
   try {
-    if (type === "JP" || type === "ETF") {
+    if (type === "JP") {
       const symbol = ticker + ".T"
       const url = "https://query1.finance.yahoo.com/v8/finance/chart/" + symbol + "?interval=1d&range=3mo"
       const res = await fetch(url)
