@@ -14,8 +14,8 @@ interface Props {
   onRemove: () => void
 }
 
-function sigLabel(s: Signal) { return s === "buy" ? "買い" : s === "sell" ? "売り" : "中立" }
-function vLabel(v: Verdict) { return v === "BUY" ? "買い場" : v === "SELL" ? "売り場" : "様子見" }
+function sigLabel(s: Signal) { return s === "buy" ? "\u8CB7\u3044" : s === "sell" ? "\u58F2\u308A" : "\u4E2D\u7ACB" }
+function vLabel(v: Verdict) { return v === "BUY" ? "\u8CB7\u3044\u5834" : v === "SELL" ? "\u58F2\u308A\u5834" : "\u69D8\u5B50\u898B" }
 
 export default function StockCard({ ticker, type, name, onRemove }: Props) {
   const [open, setOpen] = useState(false)
@@ -42,7 +42,7 @@ export default function StockCard({ ticker, type, name, onRemove }: Props) {
             <div className={styles.name}>{name}</div>
           </div>
         </div>
-        <div style={{color:"var(--muted)",fontSize:12,fontFamily:"var(--mono)"}}>データ取得中...</div>
+        <div style={{color:"var(--muted)",fontSize:12,fontFamily:"var(--mono)}}">\u30C7\u30FC\u30BF\u53D6\u5F97\u4E2D...</div>
       </div>
     </div>
   )
@@ -66,21 +66,21 @@ export default function StockCard({ ticker, type, name, onRemove }: Props) {
           <div style={{display:"flex",alignItems:"flex-start",gap:10}}>
             <div className={styles.priceBlock}>
               <div className={styles.price}>{priceStr}</div>
-              <div className={`${styles.chg} ${up ? styles.up : styles.dn}`}>{up ? "+" : ""}{d.change.toFixed(2)}%</div>
+              <div className={styles.chg + " " + (up ? styles.up : styles.dn)}>{up ? "+" : ""}{d.change.toFixed(2)}%</div>
             </div>
-            <button className={styles.removeBtn} onClick={onRemove} aria-label="削除">×</button>
+            <button className={styles.removeBtn} onClick={onRemove} aria-label="\u524A\u9664">x</button>
           </div>
         </div>
         <div className={styles.signals}>
-          {([["MA", d.maS], [`RSI ${d.rsiVal}`, d.rsiS], ["MACD", d.macdS], ["BB", d.bbS]] as [string, Signal][]).map(([label, sig]) => (
-            <span key={label} className={`${styles.sig} ${styles[sig]}`}>{label}: {sigLabel(sig)}</span>
+          {([["MA", d.maS], ["RSI " + d.rsiVal, d.rsiS], ["MACD", d.macdS], ["BB", d.bbS]] as [string, Signal][]).map(([label, sig]) => (
+            <span key={label} className={styles.sig + " " + styles[sig]}>{label}: {sigLabel(sig)}</span>
           ))}
         </div>
         <div className={styles.verdictRow}>
-          <span className={styles.verdictLabel}>総合判定</span>
-          <span className={`${styles.verdictBadge} ${styles[d.verdict]}`}>{vLabel(d.verdict)}</span>
-          <span className={styles.scoreNote}>{d.matchCount}/4 一致</span>
-          <button className={styles.detailBtn} onClick={() => setOpen(!open)}>詳細 {open ? "▴" : "▾"}</button>
+          <span className={styles.verdictLabel}>\u7DCF\u5408\u5224\u5B9A</span>
+          <span className={styles.verdictBadge + " " + styles[d.verdict]}>{vLabel(d.verdict)}</span>
+          <span className={styles.scoreNote}>{d.matchCount}/4 \u4E00\u81F4</span>
+          <button className={styles.detailBtn} onClick={() => setOpen(!open)}>\u8A73\u7D30 {open ? "\u25B4" : "\u25BE"}</button>
         </div>
       </div>
       {open && (
@@ -88,5 +88,11 @@ export default function StockCard({ ticker, type, name, onRemove }: Props) {
           <SparklineChart prices={d.prices} verdict={d.verdict} />
           <div className={styles.indGrid}>
             {[
-              { label: "MA乖離率", val: (d.maVal + "%"), hint: "vs 25日MA" },
-              { label: "RSI", val: d.rsi
+              { label: "MA\u4E56\u96E2\u7387", val: (d.maVal + "%"), hint: "vs 25\u65E5MA" },
+              { label: "RSI", val: d.rsiVal, hint: "30\u2193\u8CB7 / 70\u2191\u58F2" },
+              { label: "MACD", val: d.macdVal, hint: "0\u8D85\u3048\uFF1D\u4E0A\u6607" },
+              { label: "BB\u5E45(\u03C3)", val: (d.bbVal + "%"), hint: "\u6A19\u6E96\u504F\u5DEE/\u5E73\u5747" },
+            ].map(({ label, val, hint }) => (
+              <div key={label} className={styles.indBox}>
+                <div className={styles.indLabel}>{label}</div>
+                <div className={styles.indVal}>{val}</div>
