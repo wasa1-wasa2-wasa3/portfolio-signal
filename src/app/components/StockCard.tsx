@@ -98,4 +98,27 @@ export default function StockCard({ ticker, type, name, onRemove }: Props) {
       </div>
       {open && (
         <div className={styles.detail}>
-          <SparklineChart price
+          <SparklineChart prices={d.prices} verdict={d.verdict} />
+          <div className={styles.indGrid}>
+            <div className={styles.indBox}>
+              <div className={styles.indLabel}>MA</div>
+              <div className={styles.indVal}>{d.maVal}%</div>
+            </div>
+            <div className={styles.indBox}>
+              <div className={styles.indLabel}>RSI</div>
+              <div className={styles.indVal}>{d.rsiVal}</div>
+            </div>
+            <div className={styles.indBox}>
+              <div className={styles.indLabel}>MACD</div>
+              <div className={styles.indVal}>{d.macdVal}</div>
+            </div>
+            <div className={styles.indBox}>
+              <div className={styles.indLabel}>BB</div>
+              <div className={styles.indVal}>{d.bbVal}%</div>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  )
+}
